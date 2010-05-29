@@ -1,0 +1,3 @@
+
+def load(gameStates):
+    pass
