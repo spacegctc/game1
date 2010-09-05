@@ -1,3 +1,0 @@
-
-def load(gameStates):
-    pass

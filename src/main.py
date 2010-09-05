@@ -7,8 +7,8 @@ Created on Feb 15, 2010
 #classes, etc
 import sys, pygame
 
-#helper functions
-import mainMenu
+#helper functions!
+from menus.titleMenu import titleMenu
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -19,7 +19,7 @@ pygame.display.set_caption("game1 by Ian Owens and David Kelley, Copyright 2010"
 gameStates = {"ACTIVE":[], "VISIBLE":[], "KEYFOCUS":[]}
 
 #Load the main menu as the first active/visible/keyfocus state
-mainMenu.load(gameStates)
+titleMenu.load(gameStates)
 
 #Enter the main loop
 while True:
