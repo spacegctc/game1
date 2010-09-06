@@ -1,6 +1,6 @@
 import pygame, os
 
-class enemy01(pygame.sprite.Sprite):
+class sprite(pygame.sprite.Sprite):
     def __init__(self, spriteGroups, x):
         pygame.sprite.Sprite.__init__(self)
         self.spriteGroups = spriteGroups

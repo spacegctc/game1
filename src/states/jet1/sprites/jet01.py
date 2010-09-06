@@ -1,7 +1,7 @@
 import pygame, os
 import bullet01
 
-class jet(pygame.sprite.Sprite):
+class sprite(pygame.sprite.Sprite):
     def __init__(self, spriteGroups):
         pygame.sprite.Sprite.__init__(self)
         self.spriteGroups = spriteGroups
@@ -25,7 +25,7 @@ class jet(pygame.sprite.Sprite):
         self.settings["flyspeed"] = 8  
 
     def _fire_primary_gun(self):
-        b = bullet01(self.spriteGroups)
+        b = bullet01.sprite(self.spriteGroups)
         self.spriteGroups["mine"].add(b)
          
     def update(self):

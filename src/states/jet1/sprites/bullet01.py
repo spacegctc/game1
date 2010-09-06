@@ -1,6 +1,6 @@
 import pygame, os, explosionSmall01
 
-class bullet01(pygame.sprite.Sprite):
+class sprite(pygame.sprite.Sprite):
     def __init__(self, spriteGroups):
         pygame.sprite.Sprite.__init__(self)
         self.spriteGroups = spriteGroups
@@ -15,5 +15,5 @@ class bullet01(pygame.sprite.Sprite):
         if self.rect[1] + self.rect[3] < 0:
             self.kill()
         if pygame.sprite.spritecollideany(self, self.spriteGroups["collidables"]):
-            self.spriteGroups["nonCollidables"].add(explosionSmall01(self.spriteGroups, self.rect[0], self.rect[1]))
+            self.spriteGroups["nonCollidables"].add(explosionSmall01.sprite(self.spriteGroups, self.rect[0], self.rect[1]))
             self.kill()

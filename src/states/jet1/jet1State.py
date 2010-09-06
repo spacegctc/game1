@@ -24,7 +24,7 @@ class jet1State(gameState.GameState):
         self.spriteGroups["mine"] = pygame.sprite.Group()
         self.spriteGroups["me"] = pygame.sprite.GroupSingle()
 
-        me = jet01(self.spriteGroups)
+        me = jet01.sprite(self.spriteGroups)
         self.spriteGroups["me"].add(me)
 
         """
@@ -55,7 +55,7 @@ class jet1State(gameState.GameState):
 
         #spawn some new ships
         if random.randrange(100) > 95:
-            e = enemy01(self.spriteGroups, random.randrange(1024))
+            e = enemy01.sprite(self.spriteGroups, random.randrange(1024))
             self.spriteGroups["collidables"].add(e) 
 
     def draw(self, screen):

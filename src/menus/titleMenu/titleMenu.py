@@ -1,10 +1,10 @@
 import pygame, os, sys, menu
 
-from states.jet1 import jet1
+from states.jet1 import jet1State
 
 def newGame(gameStates):
     #person1.load(menuState.lists)
-    jet1.load(gameStates)
+    jet1State.load(gameStates)
 
 def quitGame():
     sys.exit()
