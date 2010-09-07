@@ -1,0 +1,24 @@
+# Parser is weak, make all lines strictly formatted with single spaces seperating values. Will make parser more robust later. Do not use keywords in comments.
+
+#load the background images
+bgimage 1 bg1.bmp
+bgimage 2 bg2.bmp
+bgimage 3 bg2.bmp
+bgimage 4 bg2.bmp
+bgimage 5 bg2.bmp
+
+#define the order of the background images
+scrollorder 1 2 2 3 4 5 4 3 2 1 5 5 4 4 3 3 2 2 1 1
+
+#tell what sprites we'll use
+
+#set some paramters
+setting scrollspeed 2
+setting flyspeed 16
+
+#define some events
+#spwn <time> <sprite> <y> <x> <pre callback> <post callback>
+spawn 30 enemy01 0 200 none none
+spawn 30 enemy01 0 400 none none
+spawn 35 enemy01 0 300 none none
+

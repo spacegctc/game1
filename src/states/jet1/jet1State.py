@@ -1,79 +1,116 @@
 import pygame, gameState, os, random
 from menus.pauseMenu import pauseMenu
 from sprites import jet01, enemy01
+import sprites
 
         
 class jet1State(gameState.GameState):
-    def __init__(self, level="jet1.lev"):
+    def __init__(self, level="jet1-1.lev"):
         gameState.GameState.__init__(self)
-        self.bgArray = []
-        self.bgArray.append(pygame.image.load(os.path.join("images", "jet1", "bg1.bmp")).convert())
-        self.bgArray.append(pygame.image.load(os.path.join("images", "jet1", "bg2.bmp")).convert())
-        self.bgArray.append(pygame.image.load(os.path.join("images", "jet1", "bg3.bmp")).convert())
-        self.bgArray.append(pygame.image.load(os.path.join("images", "jet1", "bg4.bmp")).convert())
-        self.bgArray.append(pygame.image.load(os.path.join("images", "jet1", "bg5.bmp")).convert())
+        self.bgDict = dict()
+        self.settingsDict = dict()
+        self.spawnDict = dict()
+        self.parse_lev(level)
+
         self.currentBg = 0
         self.nextBg = 1
         self.bgOffset = 0
         self.time = 0
-        self.settings = { "scrollspeed":2, "flyspeed":8 }
 
-        self.spriteGroups =  {"collidables":[], "nonCollidables":[], "mine":[], "me":[]}
-        self.spriteGroups["collidables"] = pygame.sprite.Group()
+        self.spriteGroups =  {"groundEnemies":[],
+                              "airEnemies":[],
+                              "enemyProjectiles":[],
+                              "myUniversalProjectiles":[],
+                              "myAirProjectiles":[],
+                              "myGroundProjectiles":[],
+                              "nonCollidables":[],
+                              "me":[]}
+        self.spriteGroups["groundEnemies"] = pygame.sprite.Group()
+        self.spriteGroups["airEnemies"] = pygame.sprite.Group()
+        self.spriteGroups["enemyProjectiles"] = pygame.sprite.Group()
+        self.spriteGroups["myUniversalProjectiles"] = pygame.sprite.Group()
+        self.spriteGroups["myAirProjectiles"] = pygame.sprite.Group()
+        self.spriteGroups["myGroundProjectiles"] = pygame.sprite.Group()
         self.spriteGroups["nonCollidables"] = pygame.sprite.Group()
-        self.spriteGroups["mine"] = pygame.sprite.Group()
         self.spriteGroups["me"] = pygame.sprite.GroupSingle()
 
-        me = jet01.sprite(self.spriteGroups)
+        me = jet01.sprite(self.spriteGroups, self.settingsDict)
         self.spriteGroups["me"].add(me)
 
-        """
-        with open(level) as lev:
-            for line in lev:
-                print line
-        """
-#        self.enemy1BulletImage = pygame.image.load(os.path.join("images", "jet1", "enemy1Bullet.bmp")).convert()
-        
+        #later find a cleaver way to precache all images, or at least load only once
+        #self.images = dict()
+        #enemy1BulletImage = pygame.image.load(os.path.join("images", "jet1", "enemy1Bullet.bmp")).convert()
+
+    def parse_lev(self, level):
+        with open(os.path.join("levels/", level)) as f:
+            for line in f:
+                strippedLine = line.strip("\n\r")
+                if "bgimage" in line:
+                    index = strippedLine.split(" ")[1]
+                    image = strippedLine.split(" ")[2]
+                    self.bgDict[index] = pygame.image.load(os.path.join("images", "jet1", image)).convert()
+                elif "scrollorder" in line:
+                    self.bgOrderArray = strippedLine.split(" ")[1:]
+                elif "setting" in line:
+                    print strippedLine.split(" ")
+                    (trash, key, value) = strippedLine.split(" ")
+                    self.settingsDict[key] = int(value)
+                elif "spawn" in line:
+                    (trash, time, sprite, x, y, pre, post) = strippedLine.split(" ")
+                    if self.spawnDict.has_key(time):
+                        self.spawnDict[time] += ((sprite, x, y, pre, post),)
+                    else:
+                        self.spawnDict[time] = ((sprite, x, y, pre, post),)
+            print "spawnDict:"
+            print self.spawnDict
+             
     def update(self):
         #update time and generate stuff from script
-        self.time += self.settings["scrollspeed"]
+        oldtime = self.time
+        self.time += self.settingsDict["scrollspeed"]
+        for t in range(oldtime, self.time):
+            if self.spawnDict.has_key(str(t)):
+                print self.spawnDict[str(t)]
+                for (sprite, x, y, pre, post) in self.spawnDict[str(t)]:
+                    print sprite, x, y, pre, post
+                    #e = getattr(sprites, sprite)
+                    #print e
+                    print (self.spriteGroups, x, y)
+        
         
         #scroll the background offsets
-        self.bgOffset += self.settings["scrollspeed"]
+        self.bgOffset += self.settingsDict["scrollspeed"]
         if self.bgOffset >= 768:
             self.currentBg = self.nextBg
             self.nextBg += 1
             self.bgOffset = 0
-            if self.nextBg >= 5:
+            if self.nextBg >= len(self.bgOrderArray):
                 self.nextBg = 0
 
         #now update other stuff
-        self.spriteGroups["me"].update()
-        self.spriteGroups["mine"].update()
-        self.spriteGroups["nonCollidables"].update()
-        self.spriteGroups["collidables"].update()
+        for group in self.spriteGroups.itervalues():
+            group.update()
 
         #spawn some new ships
         if random.randrange(100) > 95:
-            e = enemy01.sprite(self.spriteGroups, random.randrange(1024))
-            self.spriteGroups["collidables"].add(e) 
+            e = enemy01.sprite(self.spriteGroups, random.randrange(1024), 0)
+            self.spriteGroups["airEnemies"].add(e) 
 
     def draw(self, screen):
         #background first
         if self.bgOffset > 0:
-            bg2 = self.bgArray[self.nextBg]
+            bg2 = self.bgDict[self.bgOrderArray[self.nextBg]]
             subRect = (0, bg2.get_rect()[3] - self.bgOffset, bg2.get_rect()[2], self.bgOffset)
             screen.blit(bg2, (0,0), subRect)
 
-        bg1 = self.bgArray[self.currentBg]
+        bg1 = self.bgDict[self.bgOrderArray[self.currentBg]]
         subRect = (0, 0, bg1.get_rect()[2], bg1.get_rect()[3] - self.bgOffset)
         screen.blit(bg1, (0,self.bgOffset), subRect)
 
         #now the rest of the sprites
-        self.spriteGroups["me"].draw(screen)
-        self.spriteGroups["mine"].draw(screen)
-        self.spriteGroups["collidables"].draw(screen)
-        self.spriteGroups["nonCollidables"].draw(screen)
+        for group in self.spriteGroups.itervalues():
+            group.draw(screen)
+
 
     def handleKey(self, event):
         if event.type == pygame.KEYDOWN:
