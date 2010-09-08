@@ -10,15 +10,36 @@ bgimage 5 bg2.bmp
 #define the order of the background images
 scrollorder 1 2 2 3 4 5 4 3 2 1 5 5 4 4 3 3 2 2 1 1
 
-#tell what sprites we'll use
-
 #set some paramters
 setting scrollspeed 2
 setting flyspeed 16
 
 #define some events
 #spwn <time> <sprite> <y> <x> <pre callback> <post callback>
-spawn 30 enemy01 0 200 none none
-spawn 30 enemy01 0 400 none none
-spawn 35 enemy01 0 300 none none
+spawn 100 enemy01 0 256 none none
+spawn 100 enemy01 0 768 none none
+spawn 150 enemy01 0 512 none none
+spawn 250 enemy01 0 512 none none
+spawn 350 enemy01 0 512 none none
+spawn 450 enemy01 0 512 none none
+spawn 550 enemy01 0 512 none none
+spawn 650 enemy01 0 512 none none
+spawn 750 enemy01 0 512 none none
+spawn 850 enemy01 0 512 none none
+spawn 950 enemy01 0 512 none none
+spawn 1050 enemy01 0 512 none none
+spawn 1150 enemy01 0 512 none none
+spawn 1250 enemy01 0 512 none none
+spawn 1350 enemy01 0 512 none none
+spawn 1450 enemy01 0 512 none none
+spawn 1550 enemy01 0 512 none none
+spawn 1650 enemy01 0 512 none none
+spawn 1750 enemy01 0 512 none none
+spawn 1850 enemy01 0 512 none none
+spawn 1950 enemy01 0 512 none none
+spawn 2050 enemy01 0 512 none none
+spawn 2150 enemy01 0 512 none none
+spawn 2250 enemy01 0 512 none none
+spawn 2350 enemy01 0 512 none none
+spawn 2450 enemy01 0 512 none none
 

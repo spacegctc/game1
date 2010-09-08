@@ -1,41 +1,47 @@
+'''
+TO DO:
+- Implement single image load sprites, preferable pre-cache all images and make available in a dict
+- Fix keyboard whackyness in jet01.py key handling (if you press left/right really quick it gets stuck scrolling
+- Implement pre/post sprite callbacks (pause, resume being the major callbacks)
+- Allow .lev file to specify a time when random enemies may appear (for how long do random enemies appear, how many appear, which types may appear, etc?)
+- Come up with way more enemies, weapons, etc, add music/sound effects, improve graphics, yah yah yah
+'''
+
 import pygame, gameState, os, random
 from menus.pauseMenu import pauseMenu
 from sprites import jet01, enemy01
-import sprites
 
         
 class jet1State(gameState.GameState):
     def __init__(self, level="jet1-1.lev"):
         gameState.GameState.__init__(self)
-        self.bgDict = dict()
-        self.settingsDict = dict()
-        self.spawnDict = dict()
-        self.parse_lev(level)
 
         self.currentBg = 0
         self.nextBg = 1
         self.bgOffset = 0
         self.time = 0
 
-        self.spriteGroups =  {"groundEnemies":[],
-                              "airEnemies":[],
-                              "enemyProjectiles":[],
-                              "myUniversalProjectiles":[],
-                              "myAirProjectiles":[],
-                              "myGroundProjectiles":[],
-                              "nonCollidables":[],
-                              "me":[]}
-        self.spriteGroups["groundEnemies"] = pygame.sprite.Group()
-        self.spriteGroups["airEnemies"] = pygame.sprite.Group()
-        self.spriteGroups["enemyProjectiles"] = pygame.sprite.Group()
-        self.spriteGroups["myUniversalProjectiles"] = pygame.sprite.Group()
-        self.spriteGroups["myAirProjectiles"] = pygame.sprite.Group()
-        self.spriteGroups["myGroundProjectiles"] = pygame.sprite.Group()
-        self.spriteGroups["nonCollidables"] = pygame.sprite.Group()
-        self.spriteGroups["me"] = pygame.sprite.GroupSingle()
+        self.bgDict = dict()
+        self.settingsDict = dict()
+        self.spawnDict = dict()
+        self.spriteMap = {"enemy01":enemy01}
+
+        self.spriteGroups =  {"groundEnemies":[],            # Tanks and bases and such
+                              "airEnemies":[],               # Planes and helicopters and stuff, also enemy missiles which can be shot down
+                              "enemyProjectiles":[],         # Enemy bullets/missiles which cannot be shot down
+                              "myUniversalProjectiles":[],   # Bullets/missiles/bombs capable of hitting all targets
+                              "myAirProjectiles":[],         # Bullets/missiles/bombs capable of hitting air targets only
+                              "myGroundProjectiles":[],      # Bullets/missiles/bombs capable of hitting ground targets only
+                              "bonuses":[],                  # Weapon upgrades, money, etc
+                              "nonCollidables":[]}           # Explosion graphics and such
+        for key in self.spriteGroups:
+            self.spriteGroups[key] = pygame.sprite.Group()
 
         me = jet01.sprite(self.spriteGroups, self.settingsDict)
+        self.spriteGroups["me"] = pygame.sprite.GroupSingle()
         self.spriteGroups["me"].add(me)
+
+        self.parse_lev(level)
 
         #later find a cleaver way to precache all images, or at least load only once
         #self.images = dict()
@@ -56,13 +62,11 @@ class jet1State(gameState.GameState):
                     (trash, key, value) = strippedLine.split(" ")
                     self.settingsDict[key] = int(value)
                 elif "spawn" in line:
-                    (trash, time, sprite, x, y, pre, post) = strippedLine.split(" ")
+                    (trash, time, sprite, y, x, pre, post) = strippedLine.split(" ")
                     if self.spawnDict.has_key(time):
-                        self.spawnDict[time] += ((sprite, x, y, pre, post),)
+                        self.spawnDict[time] += ((self.spriteMap[sprite], int(y), int(x), pre, post),)
                     else:
-                        self.spawnDict[time] = ((sprite, x, y, pre, post),)
-            print "spawnDict:"
-            print self.spawnDict
+                        self.spawnDict[time] = ((self.spriteMap[sprite], int(y), int(x), pre, post),)
              
     def update(self):
         #update time and generate stuff from script
@@ -70,13 +74,10 @@ class jet1State(gameState.GameState):
         self.time += self.settingsDict["scrollspeed"]
         for t in range(oldtime, self.time):
             if self.spawnDict.has_key(str(t)):
-                print self.spawnDict[str(t)]
-                for (sprite, x, y, pre, post) in self.spawnDict[str(t)]:
-                    print sprite, x, y, pre, post
-                    #e = getattr(sprites, sprite)
-                    #print e
-                    print (self.spriteGroups, x, y)
-        
+                for (sprite, y, x, pre, post) in self.spawnDict[str(t)]:
+                    s = sprite.sprite(self, self.spriteGroups, y, x, pre, post)
+                    for group in s.getGroups():
+                        self.spriteGroups[group].add(s)        
         
         #scroll the background offsets
         self.bgOffset += self.settingsDict["scrollspeed"]
@@ -91,10 +92,12 @@ class jet1State(gameState.GameState):
         for group in self.spriteGroups.itervalues():
             group.update()
 
+
         #spawn some new ships
-        if random.randrange(100) > 95:
-            e = enemy01.sprite(self.spriteGroups, random.randrange(1024), 0)
-            self.spriteGroups["airEnemies"].add(e) 
+        #if random.randrange(100) > 95:
+            #e = enemy01.sprite(self, self.spriteGroups, 0, random.randrange(1024), None, None)
+            #self.spriteGroups["airEnemies"].add(e)
+
 
     def draw(self, screen):
         #background first
