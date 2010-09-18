@@ -1,4 +1,5 @@
-import pygame, os, explosionSmall01
+import pygame, os
+from states.jet1.sprites.graphics import explosionSmall01
 
 class sprite(pygame.sprite.Sprite):
     def __init__(self, spriteGroups):

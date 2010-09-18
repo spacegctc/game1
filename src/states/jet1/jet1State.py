@@ -7,9 +7,10 @@ TO DO:
 - Come up with way more enemies, weapons, etc, add music/sound effects, improve graphics, yah yah yah
 '''
 
-import pygame, gameState, os, random
+import pygame, gameState, os
 from menus.pauseMenu import pauseMenu
-from sprites import jet01, enemy01
+from sprites import jet01
+from sprites.enemies import enemy01
 
         
 class jet1State(gameState.GameState):
@@ -58,7 +59,6 @@ class jet1State(gameState.GameState):
                 elif "scrollorder" in line:
                     self.bgOrderArray = strippedLine.split(" ")[1:]
                 elif "setting" in line:
-                    print strippedLine.split(" ")
                     (trash, key, value) = strippedLine.split(" ")
                     self.settingsDict[key] = int(value)
                 elif "spawn" in line:
@@ -112,7 +112,13 @@ class jet1State(gameState.GameState):
 
         #now the rest of the sprites
         for group in self.spriteGroups.itervalues():
-            group.draw(screen)
+            if group == self.spriteGroups["me"]:
+                if group.sprite.dead == 0:
+                    group.draw(screen) #Allow jet01 to draw itself
+                else:
+                    group.clear(screen, screen)
+            else:
+                group.draw(screen)
 
 
     def handleKey(self, event):
