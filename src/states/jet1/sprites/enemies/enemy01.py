@@ -1,7 +1,20 @@
 import pygame, os
 
 class sprite(pygame.sprite.Sprite):
-    def __init__(self, parrent, spriteGroups, y, x, pre, post):
+    def __init__(self, parent, spriteGroups, y, x, pre, post):
+        self.pre = None
+        self.post = None
+        if pre != "none":
+            if pre[:7] == "parent.":
+                self.pre = getattr(parent, pre[7:])
+            else:
+                self.pre = getattr(self, pre)
+            self.pre()
+        if post != "none":
+            if post[:7] == "parent.":
+                self.post = getattr(parent, post)
+            else:
+                self.post = getattr(self, post[7:])
         pygame.sprite.Sprite.__init__(self)
         self.spriteGroups = spriteGroups
         self.image = pygame.image.load(os.path.join("images", "jet1", "enemy1.bmp")).convert()
@@ -19,8 +32,13 @@ class sprite(pygame.sprite.Sprite):
     def damage(self, life=1):
         self.life -= 1
         if self.life < 1:
-            self.kill()
+            self.die()
 
     def getGroups(self):
         yield "airEnemies"
+
+    def die(self):
+        self.kill()
+        if self.post != None:
+            self.post()
         
